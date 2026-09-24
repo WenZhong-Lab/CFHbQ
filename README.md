@@ -1,5 +1,6 @@
 # CFHbQ: Image-Based Quantification of Plasma Cell-Free Hemoglobin and Hemolysis Assessment
 
+Here, we developed cell-free hemoglobin quantification (CFHbQ), an imaging- and machine learning-based approach for rapid, non-destructive free hemoglobin quantification and automated hemolysis assessment.
 Code accompanying the manuscript *"Rapid and Non-Destructive Imaging-Based Quantification of
 Cell-Free Hemoglobin for Hemolysis Assessment"* (under review).
 
