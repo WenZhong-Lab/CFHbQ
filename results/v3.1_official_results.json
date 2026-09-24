@@ -1,0 +1,145 @@
+{
+ "version": "model_V4 (E2: piecewise OOF calibration, formerly v3.1; audited 2026-08-18)",
+ "calibration": {
+  "type": "piecewise",
+  "breakpoint": 40.0,
+  "low": {
+   "k": 0.4217342122745665,
+   "b": 5.9456175122026895,
+   "fit_on": "19 OOF samples with pred<40"
+  },
+  "high": {
+   "k": 1.0152939929280926,
+   "b": -5.162721596042388,
+   "fit_on": "all 289 OOF samples (15 features)"
+  },
+  "oof_r2": 0.8442993667330293,
+  "model": "stacking",
+  "note": "BUGFIX 2026-08-18: OOF refit on the selected 15 features (previously 43-dim)"
+ },
+ "holdout": {
+  "n": 73,
+  "raw": {
+   "r2": 0.8909,
+   "rmse": 74.22
+  },
+  "cal": {
+   "r2": 0.8915,
+   "rmse": 74.0
+  },
+  "binary_20_mgdl": {
+   "acc": 0.9726,
+   "sens": 0.9853,
+   "spec": 0.8,
+   "tn": 4,
+   "fp": 1,
+   "fn": 1,
+   "tp": 67
+  },
+  "binary": {
+   "acc": 0.9863,
+   "sens": 0.9848,
+   "spec": 1.0,
+   "tp": 65,
+   "tn": 7,
+   "fp": 0,
+   "fn": 1
+  }
+ },
+ "test_set1": {
+  "n": 41,
+  "r2": 0.9395,
+  "rmse": 87.3,
+  "binary_20_mgdl": {
+   "acc": 0.9268,
+   "sens": 1.0,
+   "spec": 0.75,
+   "tp": 29,
+   "tn": 9,
+   "fp": 3,
+   "fn": 0
+  },
+  "binary": {
+   "acc": 1.0,
+   "sens": 1.0,
+   "spec": 1.0,
+   "tp": 28,
+   "tn": 13,
+   "fp": 0,
+   "fn": 0
+  }
+ },
+ "test_set2": {
+  "n": 41,
+  "r2": 0.9167,
+  "rmse": 102.5,
+  "binary_20_mgdl": {
+   "acc": 0.9268,
+   "sens": 1.0,
+   "spec": 0.75,
+   "tp": 29,
+   "tn": 9,
+   "fp": 3,
+   "fn": 0
+  },
+  "binary": {
+   "acc": 0.9756,
+   "sens": 1.0,
+   "spec": 0.9231,
+   "tp": 28,
+   "tn": 12,
+   "fp": 1,
+   "fn": 0
+  }
+ },
+ "test_set3": {
+  "n": 41,
+  "r2": 0.9084,
+  "rmse": 107.4,
+  "binary_20_mgdl": {
+   "acc": 0.8537,
+   "sens": 1.0,
+   "spec": 0.5,
+   "tp": 29,
+   "tn": 6,
+   "fp": 6,
+   "fn": 0
+  },
+  "binary": {
+   "acc": 1.0,
+   "sens": 1.0,
+   "spec": 1.0,
+   "tp": 28,
+   "tn": 13,
+   "fp": 0,
+   "fn": 0
+  }
+ },
+ "test_set4": {
+  "n": 41,
+  "r2": 0.9317,
+  "rmse": 92.8,
+  "binary_20_mgdl": {
+   "acc": 1.0,
+   "sens": 1.0,
+   "spec": 1.0,
+   "tp": 29,
+   "tn": 12,
+   "fp": 0,
+   "fn": 0
+  },
+  "binary": {
+   "acc": 0.9756,
+   "sens": 0.9643,
+   "spec": 1.0,
+   "tp": 27,
+   "tn": 13,
+   "fp": 0,
+   "fn": 1
+  }
+ },
+ "hemolysis_binary_threshold_mgdl": 50,
+ "hemolysis_note": "2026-08-18: binary hemolysis threshold changed 20 -> 50 mg/dL (literature-consistent visible-hemolysis cutoff, user decision). Model and calibration unchanged. binary_20_mgdl kept as sensitivity analysis: at 20 mg/dL sensitivity 100% but specificity 50-75% under dim/baffle light. At 50 mg/dL: specificity 100%, 4 test FN are mild hemolysis samples (true 61.4-67.5 mg/dL, same plasma 12-03_1_15 in 3 lights + 12-03_1_19 bgl1120).",
+ "model_name": "model_V4",
+ "data_correction_note": "2026-08-19: test sample 12-03_1_15 (4 lights) true concentration corrected 67.53 -> 21.24 per user (registration error; 08-10 features CSV already had 21.24). Test-set metrics recomputed; model/predictions unchanged. The 3 apparent mild-hemolysis FNs at 50 mg/dL disappeared (that sample is truly non-hemolytic); only 12-03_1_19_bgl1120 (true 61.4) remains an FN."
+}

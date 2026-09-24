@@ -1,0 +1,16 @@
+{
+  "type": "piecewise",
+  "breakpoint": 40.0,
+  "low": {
+    "k": 0.42173421227456587,
+    "b": 5.945617512202739,
+    "fit_on": "19 OOF samples with pred<40"
+  },
+  "high": {
+    "k": 1.015293992928092,
+    "b": -5.162721596042331,
+    "fit_on": "all 289 OOF samples"
+  },
+  "oof_r2": 0.8442993667330287,
+  "model": "stacking"
+}

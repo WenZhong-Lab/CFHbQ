@@ -1,0 +1,11 @@
+# 复现输出
+model_v4_repro/
+verify_full_repro/
+*.pyc
+__pycache__/
+.DS_Store
+.release_marker
+
+# 图片数据 (本地保留供验证与 Zenodo 上传; 不入 GitHub)
+data/
+data.tar.gz

@@ -1,0 +1,89 @@
+# CFHbQ: Image-Based Quantification of Plasma Cell-Free Hemoglobin and Hemolysis Assessment
+
+Code and data accompanying the manuscript *"A Rapid, Low-Cost, and Non-Destructive Imaging System for
+Quantifying Plasma Cell-Free Hemoglobin and Assessing Hemolysis"* (Journal of Translational Medicine).
+
+CFHbQ predicts cell-free hemoglobin (CFHb) concentration from a single photograph of a centrifuged
+plasma tube (43 color features → RFECV feature selection → Stacking ensemble → out-of-fold piecewise
+recalibration), and classifies hemolysis with a 50 mg/dL decision threshold.
+
+## Repository structure
+
+```
+.
+├── plasma_pipeline.py            # main pipeline: batch correction → feature extraction →
+│                                 #   feature selection → training → OOF recalibration → evaluation
+├── model_training_v2_1.py        # model trainer (RF / XGBoost / MLP / Stacking / Voting)
+├── cut_plasma_target_region.py   # plasma ROI segmentation (Lab thresholding + morphology)
+├── reproduce_model_v4.sh         # one-command reproduction (frozen features, no image processing)
+├── requirements.txt              # pinned environment
+├── sample_list.txt               # per-image metadata (batch, split, concentration, flags)
+├── MODEL_CARD.md                 # model card (configuration & official metrics)
+├── data/blood_imag/<batch>/      # images used in the study (jpg, 2736 × 1824)
+│   ├── plasma/<sample_id>/<sample_id>.jpg   # 526 plasma tube images (file name = SampleID)
+│   └── calibration/<HUE>/<HUE>-<level>.jpg  # standard color solution images (levels 5–10)
+└── results/                      # official model outputs (model_V4)
+    ├── features_20260818_170937.csv           # frozen 43-feature snapshot (526 × 43)
+    ├── calibration.json                       # piecewise recalibration (breakpoint 40 mg/dL)
+    ├── correction_factors.csv                 # per-batch RGB correction factors
+    ├── stacking_model.pkl                     # deployed Stacking model
+    ├── summary.csv, predictions_test_set*.csv # evaluation outputs
+    ├── oof_predictions.csv                    # out-of-fold predictions on the 289 training images
+    └── v3.1_official_results.json             # consolidated official metrics
+```
+
+## Data
+
+* **Plasma images** (`data/blood_imag/<batch>/plasma/<sample_id>/`): one photograph per sample
+  (centrifuged EDTA plasma tube; tube kept in a fixed holder against an LED backlight).
+  526 images from 25 acquisition batches were used for model development and evaluation;
+  the 164-image independent test set comprises the same 41 plasma samples imaged under
+  four background-light conditions (bgl1100 / bgl1100_Baffle / bgl1050 / bgl1120).
+* **Standard color solutions** (`data/blood_imag/<batch>/calibration/<HUE>/`): Chinese Pharmacopoeia
+  (2020) standard colorimetric solutions (cobalt chloride, potassium dichromate and copper sulfate
+  mixed in defined proportions, filled in Nessler tubes), six hues (GY, YG, Y, OY, OR, BR) × levels
+  0.5–10; levels 5–10 are included here, as used in this study. Batch correction factors are derived
+  from these solutions only (reference level estimated from the training batches; no plasma image or
+  label enters factor estimation).
+* `sample_list.txt` columns: `SampleName`, `BatchID`, `SampleID`, `Concentration` (mg/dL),
+  `splitData` (`train_set` / `test_set1–4`), `exclude`, illumination flags, etc.
+
+## Environment
+
+```
+pip install -r requirements.txt      # python 3.10; scikit-learn 1.3.0, xgboost 0.82, opencv, skimage, ...
+```
+
+## Reproduction
+
+**Quick (recommended, minutes):** reproduces the deployed model from the frozen feature snapshot —
+no image processing required.
+
+```bash
+bash reproduce_model_v4.sh            # outputs to model_v4_repro/
+```
+
+Expected (identical to `results/`): independent test mean R² = **0.9241**, RMSE = 97.5 mg/dL;
+internal validation (n = 73) R² = **0.8915**, RMSE = 74.0 mg/dL; hemolysis accuracy 98.8 %
+(threshold 50 mg/dL, independent test).
+
+**Full (from images):** recomputes features from the raw images in `./data/blood_imag` and reruns
+the whole pipeline (feature extraction → RFECV → training → recalibration → evaluation).
+
+```bash
+python plasma_pipeline.py                                  # automatic: uses ./data/blood_imag
+python plasma_pipeline.py --fixed_features=model_v4        # + skip RFECV (deterministic 15 features)
+```
+
+Note: RFECV sits on a flat CV plateau where two features (`Lab_L_median` vs `CIECAM02_J`) differ in
+Ridge |coef| by ~1e-12, so its selection can flip under floating-point noise of image processing.
+For bit-level reproducibility use `--fixed_features=model_v4` (the 15 official features written in
+`plasma_pipeline.py`), which is also the route used by `reproduce_model_v4.sh`.
+
+## License
+
+To be finalized. Please contact the corresponding author before reuse.
+
+## Contact
+
+Corresponding author (see manuscript). Issues and questions: please open a GitHub issue.
