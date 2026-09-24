@@ -1,7 +1,7 @@
 # CFHbQ: Image-Based Quantification of Plasma Cell-Free Hemoglobin and Hemolysis Assessment
 
-Code and data accompanying the manuscript *"A Rapid, Low-Cost, and Non-Destructive Imaging System for
-Quantifying Plasma Cell-Free Hemoglobin and Assessing Hemolysis"* (Journal of Translational Medicine).
+Code accompanying the manuscript *"Rapid and Non-Destructive Imaging-Based Quantification of
+Cell-Free Hemoglobin for Hemolysis Assessment"* (under review).
 
 CFHbQ predicts cell-free hemoglobin (CFHb) concentration from a single photograph of a centrifuged
 plasma tube (43 color features → RFECV feature selection → Stacking ensemble → out-of-fold piecewise
@@ -18,21 +18,28 @@ recalibration), and classifies hemolysis with a 50 mg/dL decision threshold.
 ├── reproduce_model_v4.sh         # one-command reproduction (frozen features, no image processing)
 ├── requirements.txt              # pinned environment
 ├── sample_list.txt               # per-image metadata (batch, split, concentration, flags)
+├── splitdata_formodel.txt        # batch-level train/test split definition
 ├── MODEL_CARD.md                 # model card (configuration & official metrics)
-├── data/blood_imag/<batch>/      # images used in the study (jpg, 2736 × 1824)
-│   ├── plasma/<sample_id>/<sample_id>.jpg   # 526 plasma tube images (file name = SampleID)
-│   └── calibration/<HUE>/<HUE>-<level>.jpg  # standard color solution images (levels 5–10)
 └── results/                      # official model outputs (model_V4)
     ├── features_20260818_170937.csv           # frozen 43-feature snapshot (526 × 43)
     ├── calibration.json                       # piecewise recalibration (breakpoint 40 mg/dL)
     ├── correction_factors.csv                 # per-batch RGB correction factors
-    ├── stacking_model.pkl                     # deployed Stacking model
+    ├── stacking_model.pkl                     # deployed Stacking model (load with joblib.load)
     ├── summary.csv, predictions_test_set*.csv # evaluation outputs
     ├── oof_predictions.csv                    # out-of-fold predictions on the 289 training images
+    ├── stacking_conc_predict_validation_results.csv  # internal-validation predictions
+    │                                          #   (pre-recalibration; see results/calibration.json)
     └── v3.1_official_results.json             # consolidated official metrics
 ```
 
+The imaging data (`data/blood_imag/`) are not stored in this repository — see **Data** below.
+
 ## Data
+
+The imaging dataset is deposited in the Zenodo archive (**DOI: to be added**). Download and extract
+it so that the images sit under `data/blood_imag/` in this repository; the full pipeline
+(`python plasma_pipeline.py`) will then run from the raw images. Without the images, the quick
+reproduction route below still works from the frozen artifacts in `results/`.
 
 * **Plasma images** (`data/blood_imag/<batch>/plasma/<sample_id>/`): one photograph per sample
   (centrifuged EDTA plasma tube; tube kept in a fixed holder against an LED backlight).
@@ -65,7 +72,10 @@ bash reproduce_model_v4.sh            # outputs to model_v4_repro/
 
 Expected (identical to `results/`): independent test mean R² = **0.9241**, RMSE = 97.5 mg/dL;
 internal validation (n = 73) R² = **0.8915**, RMSE = 74.0 mg/dL; hemolysis accuracy 98.8 %
-(threshold 50 mg/dL, independent test).
+(threshold 50 mg/dL, independent test). Note: the pipeline's console prints the internal-validation
+metrics after applying only the high-segment recalibration line (R² = 0.8916, RMSE = 73.97); the
+piecewise-recalibrated values reported in the paper (0.8915 / 74.0) are obtained by applying
+`results/calibration.json` and are also listed in `results/v3.1_official_results.json`.
 
 **Full (from images):** recomputes features from the raw images in `./data/blood_imag` and reruns
 the whole pipeline (feature extraction → RFECV → training → recalibration → evaluation).
@@ -82,7 +92,7 @@ For bit-level reproducibility use `--fixed_features=model_v4` (the 15 official f
 
 ## License
 
-To be finalized. Please contact the corresponding author before reuse.
+MIT License — see [LICENSE](LICENSE).
 
 ## Contact
 
