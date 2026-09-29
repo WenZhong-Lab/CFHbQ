@@ -41,7 +41,7 @@ The imaging data (`data/blood_imag/`) are not stored in this repository — see 
 
 ## Data
 
-The imaging dataset is deposited in the Zenodo archive (**DOI: to be added**). Download and extract
+The imaging dataset is deposited in the Zenodo archive (**DOI: 10.5281/zenodo.22936478**). Download and extract
 it so that the images sit under `data/blood_imag/` in this repository; the full pipeline
 (`python plasma_pipeline.py`) will then run from the raw images. Without the images, the quick
 reproduction route below still works from the frozen artifacts in `results/`.
